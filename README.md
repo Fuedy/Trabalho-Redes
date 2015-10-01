@@ -1,6 +1,6 @@
 # Trabalho-Redes
 Repositório para trabalho de redes da UFSCar - 2015
-Autores:
-André de Castro Pessoa Guimaraes
-Lucas Félix de Lima
-Rodrigo Texeira Garcia
+Autores: <br>
+André de Castro Pessoa Guimaraes <br>
+Lucas Félix de Lima <br>
+Rodrigo Texeira Garcia <br>
