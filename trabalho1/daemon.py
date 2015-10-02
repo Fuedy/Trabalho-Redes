@@ -3,6 +3,7 @@ from threading import Thread
 import sys
 import subprocess
 import socket
+import time
 
 TAMANHO_MAX = 4096
 
@@ -34,20 +35,17 @@ def handle(clientsocket):
 			print str(pacoteResposta)
 			clientsocket.send(pacoteResposta)
 
+PORT = 10000
+HOST = '192.168.0.16'
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-PORT = 10000
-HOST = '127.0.0.1'
-
-serversocket.bind((HOST, PORT))
-serversocket.listen(10)
+while serversocket.connect_ex((HOST,PORT)) <>0:
+	print "Esperando abrir conexao com o backend.py"
+	time.sleep(2)
 
 while 1:
-    (clientsocket, address) = serversocket.accept()
-
-    ct = Thread(target=handle, args=(clientsocket,))
-    ct.run()
+	ct = Thread(target=handle, args=(serversocket,))
+	ct.run()
 
 
 
