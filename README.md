@@ -1,11 +1,11 @@
 # Trabalho-Redes
-Repositório para trabalho de redes da UFSCar - 2015
+Repositório para trabalho de redes da UFSCar - 2015 <br><br>
 Autores: <br>
 André de Castro Pessoa Guimaraes <br>
 Lucas Felix de Lima <br>
 Rodrigo Texeira Garcia <br>
 
-Informacoes relevantes/necessárias: <br>
+<h2>Informacoes relevantes/necessárias:</h2> <br>
 
 1)É necessário colocar o endereco de ip dos daemons no programa webserver.py <br>
 	Para isso é necessário colocar esses ips no vetor HOST[] logo no inicio do programa <br>
