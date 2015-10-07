@@ -49,7 +49,6 @@ for i in range(1,4):
 
 		#condicao para verificar se a caixa de marcacao do comando, no formulario, esta marcada
 		if (form.getvalue("maq"+str(i)+"_"+COMANDOS[j])):
-
 			#caso a caixa esteja marcada, e armazenado em uma variavel o parametro selecionado
 			parametro = form.getvalue("maq"+str(i)+"-"+COMANDOS[j])
 
@@ -66,11 +65,31 @@ for i in range(1,4):
 			#resposta recebida da maquina. Armazenada em uma variavel
 			resposta = cSocket.recv(16384)
 
-			#substituicao da quebra de linha da resposta recebida para o formato em html. Feito para melhor visualizacao na pagina html de resposta dos comandos
-			resposta = resposta.replace("\n", "<br>")
+			#devido ao "Mounted on" ter um espaco em seu nome tivemos que concatena-lo para que nossa regra de pular linha na tabela funcione
+			resposta = resposta.replace("Mounted on", "MountedOn")
 
-			#exibicao da resposta do comando requisitado
-			print "<p>" + str(resposta[11:]) + "</p>"
+			#aqui apenas marcamos o final de cada linha da tabela
+			resposta = resposta.replace("\n", " fimLinha ")
+			print "<table>"
+			print "<tr>"
+
+			#conta o numero de palavras que terao que ser exibidas na resposta
+			nroPalavras = len(resposta[11:].split())
+
+			#e separado cada palavra da resposta
+			resposta = resposta[11:].split()
+
+			#no final de cada linha e colocado um </tr> para funcionar como final de linha de tabela
+			#ao final de cada palavra e dado um </td> para mostrar o final de cada celula da tabela
+			for k in range(nroPalavras):
+				if str(resposta[k]) == "fimLinha":
+					print "</tr>"
+				else:
+					print "<td>"
+					print str(resposta[k])
+					print "</td>"
+			print "</tr>"
+			print "</table>"
 
 	#fechamento do socket aberto para comunicao com a maquina
 	cSocket.close()
