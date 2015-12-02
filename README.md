@@ -5,7 +5,9 @@ André de Castro Pessoa Guimaraes <br>
 Lucas Felix de Lima <br>
 Rodrigo Texeira Garcia <br>
 
-<h2>Informacoes relevantes/necessárias:</h2> <br>
+<h2> Repositório para o T1 e o T2</h2>
+
+<h2>Informacoes necessárias para T1:</h2> <br>
 
 1)É necessário colocar o endereco de ip dos daemons no programa webserver.py <br>
 	Para isso é necessário colocar esses ips no vetor HOST[] logo no inicio do programa <br>
@@ -14,3 +16,6 @@ Rodrigo Texeira Garcia <br>
 4)A porta definida pelo grupo é a 10000 <br>
 5)A página html com as informacoes recebidas das máquinas também é criada no arquivo webserver.py durante a execucao dos comandos <br>
 6)Foi utilizado python2.7
+
+<h2>Informacoes necessárias para T2:</h2> <br>
+Em construção ainda...
