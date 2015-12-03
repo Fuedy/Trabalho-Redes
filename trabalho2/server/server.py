@@ -4,8 +4,9 @@ import os.path
 import struct
 import math
 import os
+import binascii
 
-headerproto = "%d ||"
+headerproto = "%d|%d||"
 
 def WriteChunk(fInput, fOutput, nMaxBytes):
     
@@ -32,12 +33,14 @@ def WriteChunkFiles(sInputFilepath, sInputFilename, sOutputFilepath, sPrefix, nC
 
 	        sOutputFilespec = sOutputFilepath + sPrefix + str(nChunkNumber) + "_" + sInputFilename
 	        out = open(sOutputFilespec, "wb")
-	        header = headerproto % (nChunkNumber)
 
 	        WriteChunk(f, out, nChunkSize)
 
 	        g = open(sOutputFilespec, "rb")
 	        data = g.read()
+	        checksum = binascii.crc32(data)
+
+	        header = headerproto % (nChunkNumber, checksum)
 	        data = header + data
 	        s.sendto(data,addr)
 	        #mensagem = s.recvfrom(buf)
@@ -45,7 +48,7 @@ def WriteChunkFiles(sInputFilepath, sInputFilename, sOutputFilepath, sPrefix, nC
          	os.remove(sOutputFilespec)
 
 	        if f.closed:
-	        	header = headerproto % (-1)
+	        	header = headerproto % (-1, 0)
 	        	s.sendto(header, addr)
 	        	break
 	            
