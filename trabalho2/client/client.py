@@ -37,7 +37,6 @@ def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
         if os.path.isfile(sSourceFilespec):
             AppendChunk(sSourceFilespec, fDestinationFile)
             os.remove(sSourceFilespec)
-            print "reading " + sSourceFilespec
             nChunkNumber = nChunkNumber + 1
         else:
             break
@@ -65,10 +64,19 @@ while True:
 		pedaco = "chunk" + str(numerochunk) + "_" + nomeArquivo
 		f = open(pedaco,'wb')
 		data,addr = s.recvfrom(buf)
-		s.sendto("ack", addr)
-		f.write(data)
-		s.settimeout(1)
-		numerochunk = numerochunk + 1
+		#s.sendto("ack", addr)
+		headerpos = data.find("||")
+		message = data[headerpos+2:]
+		header = data[0:headerpos]
+		header = header.split("|")
+		print header
+		if header[0] != -1 :
+			f.write(message)
+			s.settimeout(1)
+			numerochunk = numerochunk + 1
+		else:
+			f.close()
+			s.close()
 	except timeout:
 		f.close()
 		s.close()

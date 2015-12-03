@@ -1,6 +1,11 @@
 from socket import *
 import sys
 import os.path
+import struct
+import math
+import os
+
+headerproto = "%d ||"
 
 def WriteChunk(fInput, fOutput, nMaxBytes):
     
@@ -27,21 +32,24 @@ def WriteChunkFiles(sInputFilepath, sInputFilename, sOutputFilepath, sPrefix, nC
 
 	        sOutputFilespec = sOutputFilepath + sPrefix + str(nChunkNumber) + "_" + sInputFilename
 	        out = open(sOutputFilespec, "wb")
+	        header = headerproto % (nChunkNumber)
 
 	        WriteChunk(f, out, nChunkSize)
 
 	        g = open(sOutputFilespec, "rb")
-	        data = g.read(buf)
+	        data = g.read()
+	        data = header + data
 	        s.sendto(data,addr)
-	        mensagem = s.recvfrom(buf)
-         	print str(mensagem)
+	        #mensagem = s.recvfrom(buf)
+         	#print str(mensagem)
          	os.remove(sOutputFilespec)
 
 	        if f.closed:
-	            break
+	        	header = headerproto % (-1)
+	        	s.sendto(header, addr)
+	        	break
 	            
 	        nChunkNumber = nChunkNumber + 1
-
 
 
 s = socket(AF_INET,SOCK_DGRAM)
@@ -56,6 +64,6 @@ print file_name
 
 s.sendto(file_name,addr)
 
-WriteChunkFiles("./", str(file_name), "./", "chunk", 1024)
+WriteChunkFiles("./", str(file_name), "./", "chunk", 100)
 
 s.close()
