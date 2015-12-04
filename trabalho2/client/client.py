@@ -2,6 +2,7 @@ from socket import *
 import sys
 import select
 import binascii
+import time
 
 def AppendChunk(sSourceFilespec, fDestinationFileHandle):
 
@@ -51,7 +52,7 @@ s = socket(AF_INET,SOCK_DGRAM)
 nomeArquivo = sys.argv[3]
 
 addr = (host,port)
-buf=1024
+buf=65536
 
 s.sendto(nomeArquivo,addr)
 
@@ -71,19 +72,22 @@ while True:
 		header = data[0:headerpos]
 		header = header.split("|")
 		print header
-		if header[0] != -1 :
+		if str(header[0]) != str(-1) :
 			checksum = binascii.crc32(message)
 			print str(checksum) + "," + str(header[1])
 			if (str(checksum) == str(header[1])):
 				f.write(message)
-				s.settimeout(1)
+				#time.sleep(0.1)
+				s.sendto(header[0], addr)
+				#s.settimeout(1)
 				numerochunk = numerochunk + 1
 			else:
-				print "checksum erradddooooo"
+				print "checksum errado"
 		else:
 			print "fechou arquivo"
 			f.close()
 			s.close()
+			break
 	except timeout:
 		f.close()
 		s.close()
