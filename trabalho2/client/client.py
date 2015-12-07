@@ -3,6 +3,8 @@ import sys
 import select
 import binascii
 import time
+import random
+import os.path    
 
 def AppendChunk(sSourceFilespec, fDestinationFileHandle):
 
@@ -17,11 +19,18 @@ def AppendChunk(sSourceFilespec, fDestinationFileHandle):
             fInput.close()
             break
 
+def PacketCorruption(checksumIn, corruptionFactor):
+
+	corruptionVar = random.randint(0, corruptionFactor)
+
+	if(corruptionVar == 0):
+		checksumIn = "0"
+
+	return checksumIn
 
     
 def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
     
-    import os.path    
     sDestinationFilespec = sDestinationPath +  sFilename
     
     if os.path.isfile(sDestinationFilespec) :
@@ -38,7 +47,7 @@ def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
 
         if os.path.isfile(sSourceFilespec):
             AppendChunk(sSourceFilespec, fDestinationFile)
-            os.remove(sSourceFilespec)
+            #os.remove(sSourceFilespec)
             nChunkNumber = nChunkNumber + 1
         else:
             break
@@ -46,8 +55,9 @@ def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
             
     fDestinationFile.close()
 
-host=sys.argv[1]
+host = sys.argv[1]
 port = int(sys.argv[2])
+corruptionFactor = 1
 s = socket(AF_INET,SOCK_DGRAM)
 nomeArquivo = sys.argv[3]
 
@@ -63,8 +73,7 @@ numerochunk = 1
 
 while True:
 	try:
-		pedaco = "chunk" + str(numerochunk) + "_" + nomeArquivo
-		f = open(pedaco,'wb')
+		#pedaco = "chunk" + str(numerochunk) + "_" + nomeArquivo
 		data,addr = s.recvfrom(buf)
 		#s.sendto("ack", addr)
 		headerpos = data.find("||")
@@ -72,10 +81,13 @@ while True:
 		header = data[0:headerpos]
 		header = header.split("|")
 		print header
+		header[1] = PacketCorruption(header[1], corruptionFactor)
 		if str(header[0]) != str(-1) :
 			checksum = binascii.crc32(message)
 			print str(checksum) + "," + str(header[1])
 			if (str(checksum) == str(header[1])):
+				pedaco = "chunk" + str(header[0]) + "_" + nomeArquivo
+				f = open(pedaco,'wb')
 				f.write(message)
 				#time.sleep(0.1)
 				s.sendto(header[0], addr)
