@@ -28,6 +28,10 @@ def PacketCorruption(checksumIn, corruptionFactor):
 
 	return checksumIn
 
+def PacketLoss(packetLossFactor):
+
+	packetLossVar = random.randint(0, packetLossFactor)
+	return packetLossVar
     
 def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
     
@@ -57,7 +61,8 @@ def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
 
 host = sys.argv[1]
 port = int(sys.argv[2])
-corruptionFactor = 1
+corruptionFactor = 2
+packetLossFactor = 2
 s = socket(AF_INET,SOCK_DGRAM)
 nomeArquivo = sys.argv[3]
 
@@ -81,25 +86,28 @@ while True:
 		header = data[0:headerpos]
 		header = header.split("|")
 		print header
-		header[1] = PacketCorruption(header[1], corruptionFactor)
-		if str(header[0]) != str(-1) :
-			checksum = binascii.crc32(message)
-			print str(checksum) + "," + str(header[1])
-			if (str(checksum) == str(header[1])):
-				pedaco = "chunk" + str(header[0]) + "_" + nomeArquivo
-				f = open(pedaco,'wb')
-				f.write(message)
-				#time.sleep(0.1)
-				s.sendto(header[0], addr)
-				#s.settimeout(1)
-				numerochunk = numerochunk + 1
+		if PacketLoss(packetLossFactor) == 0 :
+			print "Perdeu o pacote"
+		else: 
+			header[1] = PacketCorruption(header[1], corruptionFactor)
+			if str(header[0]) != str(-1) :
+				checksum = binascii.crc32(message)
+				print str(checksum) + "," + str(header[1])
+				if (str(checksum) == str(header[1])):
+					pedaco = "chunk" + str(header[0]) + "_" + nomeArquivo
+					f = open(pedaco,'wb')
+					f.write(message)
+					#time.sleep(0.1)
+					s.sendto(header[0], addr)
+					#s.settimeout(1)
+					numerochunk = numerochunk + 1
+				else:
+					print "checksum errado"
 			else:
-				print "checksum errado"
-		else:
-			print "fechou arquivo"
-			f.close()
-			s.close()
-			break
+				print "fechou arquivo"
+				f.close()
+				s.close()
+				break
 	except timeout:
 		f.close()
 		s.close()
