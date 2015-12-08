@@ -59,10 +59,15 @@ def RebuildChunkedFile(sSourcePath, sFilename, sDestinationPath, sChunkPrefix):
             
     fDestinationFile.close()
 
+def RemoveTemporaryFiles(nChunkNumber,file_name):
+	for i in range (1,nChunkNumber+1):
+		sOutputFilespec = "./" + "chunk" + str(i) + "_" + str(file_name)
+		os.remove(sOutputFilespec)
+
 host = sys.argv[1]
 port = int(sys.argv[2])
-corruptionFactor = 2
-packetLossFactor = 2
+corruptionFactor = 19
+packetLossFactor = 19
 s = socket(AF_INET,SOCK_DGRAM)
 nomeArquivo = sys.argv[3]
 
@@ -91,6 +96,7 @@ while True:
 		else: 
 			header[1] = PacketCorruption(header[1], corruptionFactor)
 			if str(header[0]) != str(-1) :
+				lastChunk = header[0]
 				checksum = binascii.crc32(message)
 				print str(checksum) + "," + str(header[1])
 				if (str(checksum) == str(header[1])):
@@ -115,3 +121,4 @@ while True:
 		break
 
 RebuildChunkedFile("./", str(nomeArquivo), "./", "chunk")
+RemoveTemporaryFiles(int(lastChunk),nomeArquivo)
